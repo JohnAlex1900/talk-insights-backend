@@ -1,9 +1,10 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
 import json
-from fastapi.responses import JSONResponse
+import csv
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, FileResponse
 from speech_to_text import transcribe_audio
 from summarize import summarize_text
 from categorize import categorize_text
@@ -13,7 +14,7 @@ app = FastAPI()
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://talk-insights.vercel.app"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,14 +57,32 @@ async def get_analysis():
         return {"summary": "", "categories": [], "sentiments": {}, "complaint_severity": {}}
     return latest_analysis
 
-
 @app.get("/export")
 async def export_data():
     if not latest_analysis:
         return JSONResponse(content={"error": "No data available to export."}, status_code=400)
+
+    export_filename = "call_summary.csv"
     
-    export_filename = "call_summary.json"
-    with open(export_filename, "w") as file:
-        json.dump(latest_analysis, file, indent=2)
+    # Prepare the data for CSV export
+    data_to_export = []
+    for key, value in latest_analysis.items():
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                if isinstance(sub_value, list):
+                    data_to_export.append([key, sub_key, ", ".join(sub_value)])
+                else:
+                    data_to_export.append([key, sub_key, sub_value])
+        elif isinstance(value, list):
+            data_to_export.append([key, ", ".join(value)])
+        else:
+            data_to_export.append([key, value])
+
+    # Write to CSV
+    with open(export_filename, mode="w", newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Field", "Category", "Value"])
+        for row in data_to_export:
+            writer.writerow(row)
     
-    return JSONResponse(content={"message": "Data exported successfully.", "filename": export_filename})
+    return FileResponse(export_filename, media_type='text/csv', filename=export_filename)

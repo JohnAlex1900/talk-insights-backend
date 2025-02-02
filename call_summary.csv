@@ -1,0 +1,9 @@
+Field,Category,Value
+summary,Penny from Microsoft Canada's partner program is calling to offer assistance in improving the quality and visibility of solutions for an organization. She mentions reviewing solutions profiles in the solution profiler tool and encourages the organization to follow guidance provided in an email for improving their profile. Penny also offers support for contacting them for further assistance.
+categories,
+sentiments,positive,1
+sentiments,neutral,2
+sentiments,negative,0
+complaint_severity,minor,
+complaint_severity,major,
+complaint_severity,critical,
