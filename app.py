@@ -53,9 +53,9 @@ async def upload_audio(file: UploadFile = File(...)):
 @app.get("/analysis")
 async def get_analysis():
     if not latest_analysis:
-        return {"error": "No analysis data available. Please upload an audio file first."}
-    
+        return {"summary": "", "categories": [], "sentiments": {}, "complaint_severity": {}}
     return latest_analysis
+
 
 @app.get("/export")
 async def export_data():
