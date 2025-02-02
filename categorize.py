@@ -17,7 +17,7 @@ def categorize_text(summary):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Extract key complaints, insights, categories, and sentiment from the summary. Also, categorize complaints into severity levels (minor, major, critical). Return a JSON object like this: {\"summary\": \"\", \"categories\": [...], \"sentiments\": {\"positive\": 0, \"neutral\": 0, \"negative\": 0}, \"complaint_severity\": {\"minor\": [...], \"major\": [...], \"critical\": [...]}}. Ensure the response includes a 'summary' field."},
+                {"role": "system", "content": "Extract key complaints, leads, positive feedback, general information, and sentiment from the summary. Categorize complaints into severity levels (minor, major, critical). Return a JSON object like this: {\"summary\": \"\", \"categories\": [...], \"sentiments\": {\"positive\": 0, \"neutral\": 0, \"negative\": 0}, \"complaint_severity\": {\"minor\": [...], \"major\": [...], \"critical\": [...]}}. Ensure the response includes a 'summary' field."},
                 {"role": "user", "content": summary}
             ]
         )
