@@ -17,7 +17,7 @@ def categorize_text(summary):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Extract key complaints, insights, categories, and sentiment from the summary and return a JSON object like this: {\"categories\": [...], \"sentiments\": {\"positive\": 0, \"neutral\": 0, \"negative\": 0}}."},
+                {"role": "system", "content": "Extract key complaints, insights, categories, and sentiment from the summary. Also, categorize complaints into severity levels (minor, major, critical). Return a JSON object like this: {\"categories\": [...], \"sentiments\": {\"positive\": 0, \"neutral\": 0, \"negative\": 0}, \"complaint_severity\": {\"minor\": [], \"major\": [], \"critical\": []}}."},
                 {"role": "user", "content": summary}
             ]
         )
@@ -31,7 +31,7 @@ def categorize_text(summary):
         return structured_data
     except json.JSONDecodeError:
         print("Error: Could not parse response into JSON")
-        return {"categories": [], "sentiments": {}, "summary": ""}
+        return {"categories": [], "sentiments": {}, "complaint_severity": {"minor": [], "major": [], "critical": []}, "summary": ""}
     except Exception as e:
         print(f"Error during categorization: {e}")
-        return {"categories": [], "sentiments": {}, "summary": ""}
+        return {"categories": [], "sentiments": {}, "complaint_severity": {"minor": [], "major": [], "critical": []}, "summary": ""}

@@ -2,6 +2,8 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
+import json
+from fastapi.responses import JSONResponse
 from speech_to_text import transcribe_audio
 from summarize import summarize_text
 from categorize import categorize_text
@@ -42,13 +44,11 @@ async def upload_audio(file: UploadFile = File(...)):
     latest_analysis = {
         "summary": summary,
         "categories": insights.get("categories", []),  # Ensure default if key is missing
-        "sentiments": insights.get("sentiments", {})
+        "sentiments": insights.get("sentiments", {}),
+        "complaint_severity": insights.get("complaint_severity", {})
     }
 
     return {"transcript": transcript, "summary": summary, "insights": insights}
-
-
-
 
 @app.get("/analysis")
 async def get_analysis():
@@ -57,3 +57,13 @@ async def get_analysis():
     
     return latest_analysis
 
+@app.get("/export")
+async def export_data():
+    if not latest_analysis:
+        return JSONResponse(content={"error": "No data available to export."}, status_code=400)
+    
+    export_filename = "call_summary.json"
+    with open(export_filename, "w") as file:
+        json.dump(latest_analysis, file, indent=2)
+    
+    return JSONResponse(content={"message": "Data exported successfully.", "filename": export_filename})
